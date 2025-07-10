@@ -7,7 +7,7 @@
 
 ## 💾 Скачать
 
-➡️ [Скачать .exe для Windows (релиз)]((https://github.com/dead0000012/free_antiskuf/releases/tag/free))
+➡️ [Скачать .exe для Windows (релиз)]([https://github.com/dead0000012/free_antiskuf/releases/tag/free])
 
 ---
 
