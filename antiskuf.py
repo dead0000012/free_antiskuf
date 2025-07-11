@@ -28,24 +28,22 @@ VK_CONTROL = 0x11
 VK_F6 = 0x75
 last_pos = win32api.GetCursorPos()
 
-def reminder_loop(interval_sec):
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 150)
-    engine.setProperty('volume', 1.0)
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[0].id)
-
+def reminder_loop(interval_sec, engine):
     while True:
         time.sleep(interval_sec)
-        for e in range(3):
-            winsound.Beep(1000, 1000)
-        time.sleep(1)
+        for _ in range(3):
+            winsound.Beep(1000, 2000)
         engine.say("Прошло два часа. Сделай перерыв или разминку.")
         engine.runAndWait()
 
-# Запускаем таймер в отдельном потоке
-timer_thread = threading.Thread(target=reminder_loop, args=(2 * 60 * 60,), daemon=True)
+        ctypes.windll.user32.BlockInput(True)
+        time.sleep(5 * 60)  # 300 секунд
+        ctypes.windll.user32.BlockInput(False)
+
+# Запускаем поток, передаём уже созданный engine
+timer_thread = threading.Thread(target=reminder_loop, args=(2 * 60 * 60, engine), daemon=True)
 timer_thread.start()
+
 
 while True:
     hour = int(time.strftime("%H"))
@@ -62,7 +60,7 @@ while True:
         current_pos = win32api.GetCursorPos()
         if current_pos != last_pos:
             winsound.Beep(4000, 1000)
-        else:
+        if current_pos == last_pos:
             engine.setProperty('rate', 250)
             engine.say("Вставай — обедать!")
             engine.runAndWait()
@@ -78,6 +76,14 @@ while True:
 
     if hour == 22 and minut > 10:
         os.system("shutdown /s /t 60 /c \"Выключение через 1 минуту. Сохрани всё!\"")
+
+    if hour == 23 and minut > 1 and minut < 20:
+        engine.setProperty('rate', 200)
+        engine.say('Ого - не спишь ещё - ну тогда лови')
+        engine.runAndWait()
+        os.system("shutdown /s /t 1 /c \"Выключение через 1 секунду.\"")
+        print("БАЦ")
+
 
     if hour == 17 and minut <= 10 or hour == 9 and minut <= 5:
         ctypes.windll.user32.BlockInput(True)
